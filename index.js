@@ -1,5 +1,5 @@
 const Nightmare = require('nightmare');
-const nightmare = Nightmare({show: true});
+const nightmare = Nightmare();
 const accountInfo = require('./account.json');
 const { account, pwd, secret, id } = accountInfo;
 const https = require('https');
@@ -13,6 +13,8 @@ let authUrl = 'https://api.mendeley.com/oauth/authorize' +
 
 let access_token = '';
 let refresh_token = '';
+let refreshing = false;
+let task = [];
 
 nightmare
   .goto(authUrl)
@@ -29,16 +31,56 @@ nightmare
   .end()
   .then(getCode);
 
-function main(access_token) {
-  console.log(access_token);
+function main() {
+  getData(`10.1016/j.molcel.2009.09.013`, (data) => {
+    console.log(data);
+  });
+  
+}
+
+function getData(doi, cb) {
+  if (refreshing) {
+    setTimeout(() => {
+      console.log('监测到正在刷新token');
+      getData(doi, cb);
+    }, 1000);
+  } else {
+    let url = `https://api.mendeley.com/catalog/?doi=${doi}&view=stats`;
+    let req = https.request(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${access_token}`
+      }
+    }, (res) => {
+      let data = [];
+      res.on('data', (chunk) => {
+        data.push(chunk);
+      });
+      res.on('end', () => {
+        data = JSON.parse(data.toString());
+        cb(data);
+      });
+      res.on('error', (err) => {
+        console.log(err);
+      });
+    });
+    req.end();
+  } 
 }
 
 
 function getCode(url) {
+  console.log('登陆成功');
   let urlJson = new URL(url);
   let code = urlJson.searchParams.get('code');
   getToken(code, (access_token) => {
-    main(access_token);
+    refreshing = true;
+    setTimeout(() => {
+      getToken(refresh_token,() =>{
+        refreshing = false;
+      }, true);
+    }, 5000);
+    main();
   });
 };
 
@@ -59,6 +101,13 @@ function getToken(code, cb, refresh) {
       access_token = tokens.access_token;
       refresh_token = tokens.refresh_token;
       cb(access_token);
+      // 50分钟刷新一次
+      setTimeout(() => {
+        refreshing = true;
+        getToken(refresh_token,() =>{
+          refreshing = false;
+        }, true);
+      }, 1000 * 60 * 50);
     });
     res.on('error', (err) => {
       console.log(err);

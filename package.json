@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "hs ./test/public"
+    "dev": "hs ./test/public -p 2222"
   },
   "repository": {
     "type": "git",
@@ -17,9 +17,7 @@
   },
   "homepage": "https://github.com/Jsnows/fetchData#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "http-server": "^0.12.3",
     "nightmare": "^3.0.2",
-    "request": "^2.88.2"
+    "node-xlsx": "^0.16.1"
   }
 }

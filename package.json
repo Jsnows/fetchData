@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "hs ./test/public"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/Jsnows/fetchData#readme",
   "dependencies": {
-    "nightmare": "^3.0.2"
+    "express": "^4.17.1",
+    "http-server": "^0.12.3",
+    "nightmare": "^3.0.2",
+    "request": "^2.88.2"
   }
 }

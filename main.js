@@ -25,7 +25,7 @@ const getListData = function (list, getData, index) {
       getListData(list, getData, index);
     });
   } else {
-    console.log(item.index + '已经存在');
+    // console.log(item.index + '已经存在');
     index ++;
     getListData(list, getData, index);
   }
@@ -45,12 +45,12 @@ const getGroup = function (list, num) {
   return group;
 }
 const writeData = function (index, data) {
-  try{
-    data = JSON.stringify(data);
-  }catch(err){
-    console.log(data);
-    console.log(`解析错误 ${index}`);
-  }
+  // try{
+  //   data = JSON.stringify(data);
+  // }catch(err){
+  //   console.log(data);
+  //   console.log(`解析错误 ${index}`);
+  // }
   try{
     fs.writeFileSync(`./data/${index}.json`, data);
   }catch(err){

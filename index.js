@@ -4,6 +4,7 @@ const accountInfo = require('./account.json');
 const { account, pwd, secret, id } = accountInfo;
 const https = require('https');
 const { main } = require('./main');
+const fs = require('fs');
 
 let authUrl = 'https://api.mendeley.com/oauth/authorize' +
               '?client_id=9529' +
@@ -52,11 +53,29 @@ function getData(doi, cb) {
         data.push(chunk);
       });
       res.on('end', () => {
-        data = JSON.parse(data.toString());
-        cb(data);
+        try{
+          data = data.toString();
+          cb(data);
+        }catch(err){
+          console.log(`解析失败 ${doi}`);
+          console.log(data.toString());
+          fs.writeFile(`${__dirname}/err/${doi}.json`, data.toString());
+        }
       });
       res.on('error', (err) => {
         console.log(err);
+      });
+    });
+    req.on('timeout', () => {
+      console.log('请求超时');
+      setTimeout(() => {
+        getData(doi, cb);
+      });
+    });
+    req.on('error', (err) => {
+      console.log('请求错误 重试请求');
+      setTimeout(() => {
+        getData(doi, cb);
       });
     });
     req.end();

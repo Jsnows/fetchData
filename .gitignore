@@ -1,3 +1,5 @@
 node_modules
 account.json
 test
+*.xlsx
+data

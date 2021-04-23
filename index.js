@@ -3,6 +3,7 @@ const nightmare = Nightmare();
 const accountInfo = require('./account.json');
 const { account, pwd, secret, id } = accountInfo;
 const https = require('https');
+const { main } = require('./main');
 
 let authUrl = 'https://api.mendeley.com/oauth/authorize' +
               '?client_id=9529' +
@@ -14,8 +15,8 @@ let authUrl = 'https://api.mendeley.com/oauth/authorize' +
 let access_token = '';
 let refresh_token = '';
 let refreshing = false;
-let task = [];
 
+console.log('开始登陆');
 nightmare
   .goto(authUrl)
   .wait('#bdd-email')
@@ -31,12 +32,6 @@ nightmare
   .end()
   .then(getCode);
 
-function main() {
-  getData(`10.1016/j.molcel.2009.09.013`, (data) => {
-    console.log(data);
-  });
-  
-}
 
 function getData(doi, cb) {
   if (refreshing) {
@@ -74,13 +69,7 @@ function getCode(url) {
   let urlJson = new URL(url);
   let code = urlJson.searchParams.get('code');
   getToken(code, (access_token) => {
-    refreshing = true;
-    setTimeout(() => {
-      getToken(refresh_token,() =>{
-        refreshing = false;
-      }, true);
-    }, 5000);
-    main();
+    main(getData);
   });
 };
 
@@ -116,10 +105,3 @@ function getToken(code, cb, refresh) {
   req.write(`grant_type=${refresh ? 'refresh_token' : 'authorization_code'}&redirect_uri=${encodeURIComponent('https://www.baidu.com')}&${refresh ? 'refresh_token' : 'code'}=${code}`);
   req.end();
 }
-
-
-// const url = 'https://' + accountInfo.account + ':' + accountInfo.pwd + '@api.mendeley.com/oauth/token';
-
-// request.get({url}, function (error, response, body) {
-//    console.log(body);
-// });

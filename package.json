@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node ./index.js"
+    "start": "node ./index.js",
+    "set": "node --max-new-space-size=1024 ./setItem.js"
   },
   "repository": {
     "type": "git",

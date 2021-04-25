@@ -1,14 +1,15 @@
 const dois = require('./dois.json');
 const fs = require('fs');
 const main = function (getData) {
+  // getData('10.1007/978-3-319-66673-0', (data) => {
+  //   console.log(data);
+  // })
   let g = getGroup(dois.list, 30);
   g.forEach((list, index) => {
     getListData(list, getData);
   });
-  // getData(`10.1016/j.molcel.2009.09.013`, (data) => {
-  //   console.log(data);
-  // });
 }
+
 const getListData = function (list, getData, index) {
   index = index || 0;
   let item = list[index];
@@ -36,11 +37,17 @@ const getGroup = function (list, num) {
   for (let i = 0; i < num; i++) {
     group.push([]);
   };
+  let _num = 0;
   list.forEach((item, index) => {
-    group[index % num].push({
-      index: index,
-      doi: item
-    });
+    let filePath = `${__dirname}/data/${index}.json`;
+    if (!fs.existsSync(filePath)) {
+      group[(index - _num) % num].push({
+        index: index,
+        doi: item
+      });
+    } else {
+      _num ++;
+    }
   });
   return group;
 }
@@ -58,4 +65,5 @@ const writeData = function (index, data) {
     console.log(`写入错误 ${index}`);
   }
 }
+// main();
 module.exports.main = main;
